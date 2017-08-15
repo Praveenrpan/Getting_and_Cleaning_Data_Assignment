@@ -1,0 +1,135 @@
+Raw Data Description: 
+
+The raw data files for this project are from the Human Activity Recognition Using Smartphones Dataset
+Version 1.0
+
+run_analysis.R Code Description:
+Library used: dplyr
+
+1.	Read data relevant to the project assignments from the downloaded files and create tables
+## Read txt documents and create training datasets
+X_training <- read.table ("./UCI HAR Dataset/train/X_train.txt")
+Y_training <-read.table ("./UCI HAR Dataset/train/Y_train.txt")
+Sub_training <- read.table ("./UCI HAR Dataset/train/subject_train.txt")
+
+## Read txt documents and create testing datasets
+X_testing <- read.table ("./UCI HAR Dataset/test/X_test.txt")
+Y_testing <-read.table ("./UCI HAR Dataset/test/Y_test.txt")
+Sub_testing <- read.table ("./UCI HAR Dataset/test/subject_test.txt")
+
+2.	Acquire variable names
+
+## Read variable names
+namesofvariables <- read.table ("./UCI HAR Dataset/features.txt")
+
+## Read labels for activity
+activity_labels <- read.table ("./UCI HAR Dataset/activity_labels.txt")
+
+3. Merge datasets to create training, testing, and subject datasets
+## Merge training and test datasets to create one data set
+X_merged <- rbind (X_training, X_testing)
+Y_merged <- rbind (Y_training, Y_testing)
+Sub_merged <- rbind (Sub_training, Sub_testing)
+
+3.	Extract measurements on the mean and the standard deviation
+##Extracts only the measurements on the mean and standard deviation for each measurement.
+###############
+
+#### Mean and std in their names
+meanandstdvariables <- namesofvariables [grep("mean\\(\\)| std\\(\\)", namesofvariables [,2]),]
+X_merged <- X_merged[, meanandstdvariables[,1]]
+
+4.	5. Use descriptive names for the activities in the dataset
+####Uses descriptive activity names to name the activities in the data set
+colnames(Y_merged) <- "activity"
+Y_merged$activitylabel <- factor (Y_merged$activity, labels= as.character(activity_labels[,2]))
+activitylabel <- Y_merged [,2]
+
+####Appropriately labels the data set with descriptive variable names.
+colnames (X_merged) <- namesofvariables [meanandstdvariables[,1],2]
+
+5.	Create a new clean dataset with the mean for each activity and subject
+####From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+colnames(Sub_merged) <- "subject"
+total <- cbind (X_merged, activitylabel, Sub_merged)
+total_mean <- total %>% group_by(activitylabel, subject) %>% summarise_all(funs(mean))
+write.table (total_mean, file = "./UCI HAR Dataset/tidydata.txt", row.names=FALSE, col.names=TRUE)
+
+New Data Set (tidydata): Tidy data set contains averages of each variable for each activity and each subject
+
+New Data Set (tidydata): Tidydata set contains averages for each activity on 30 subjects with 180 rows and 68 columns.
+Data are on the following activity types (Factor variable) for Subject (Integer variable):
+1.	WALKING
+2.	WALKING_UPSTAIRS
+3.	WALKING_DOWNSTAIRS
+4.	SITTING
+5.	STANDING
+6.	LAYING
+The dataset contains averages (mean) for 66 measurements (Numeric variables):
+1.	"tBodyAcc-mean()-X"
+2.	"tBodyAcc-mean()-Y"
+3.	"tBodyAcc-mean()-Z"
+4.	"tBodyAcc-std()-X"
+5.	"tBodyAcc-std()-Y"
+6.	"tBodyAcc-std()-Z"
+7.	"tGravityAcc-mean()-X"
+8.	"tGravityAcc-mean()-Y"
+9.	"tGravityAcc-mean()-Z"
+10.	"tGravityAcc-std()-X"
+11.	"tGravityAcc-std()-Y"
+12.	"tGravityAcc-std()-Z"
+13.	"tBodyAccJerk-mean()-X"
+14.	"tBodyAccJerk-mean()-Y"
+15.	"tBodyAccJerk-mean()-Z"
+16.	"tBodyAccJerk-std()-X"
+17.	"tBodyAccJerk-std()-Y"
+18.	"tBodyAccJerk-std()-Z"
+19.	"tBodyGyro-mean()-X"
+20.	"tBodyGyro-mean()-Y"
+21.	"tBodyGyro-mean()-Z"
+22.	"tBodyGyro-std()-X"
+23.	"tBodyGyro-std()-Y"
+24.	"tBodyGyro-std()-Z"
+25.	"tBodyGyroJerk-mean()-X"
+26.	"tBodyGyroJerk-mean()-Y"
+27.	"tBodyGyroJerk-mean()-Z"
+28.	"tBodyGyroJerk-std()-X"
+29.	"tBodyGyroJerk-std()-Y"
+30.	"tBodyGyroJerk-std()-Z"
+31.	"tBodyAccMag-mean()"
+32.	"tBodyAccMag-std()"
+33.	"tGravityAccMag-mean()"
+34.	"tGravityAccMag-std()"
+35.	"tBodyAccJerkMag-mean()"
+36.	"tBodyAccJerkMag-std()"
+37.	"tBodyGyroMag-mean()"
+38.	"tBodyGyroMag-std()"
+39.	"tBodyGyroJerkMag-mean()"
+40.	"tBodyGyroJerkMag-std()"
+41.	"fBodyAcc-mean()-X"
+42.	"fBodyAcc-mean()-Y"
+43.	"fBodyAcc-mean()-Z"
+44.	"fBodyAcc-std()-X"
+45.	"fBodyAcc-std()-Y"
+46.	"fBodyAcc-std()-Z"
+47.	"fBodyAccJerk-mean()-X"
+48.	"fBodyAccJerk-mean()-Y"
+49.	"fBodyAccJerk-mean()-Z"
+50.	"fBodyAccJerk-std()-X"
+51.	"fBodyAccJerk-std()-Y"
+52.	"fBodyAccJerk-std()-Z"
+53.	"fBodyGyro-mean()-X"
+54.	"fBodyGyro-mean()-Y"
+55.	"fBodyGyro-mean()-Z"
+56.	"fBodyGyro-std()-X"
+57.	"fBodyGyro-std()-Y"
+58.	"fBodyGyro-std()-Z"
+59.	"fBodyAccMag-mean()"
+60.	"fBodyAccMag-std()"
+61.	"fBodyBodyAccJerkMag-mean()"
+62.	"fBodyBodyAccJerkMag-std()"
+63.	"fBodyBodyGyroMag-mean()"
+64.	"fBodyBodyGyroMag-std()"
+65.	"fBodyBodyGyroJerkMag-mean()"
+66.	"fBodyBodyGyroJerkMag-std()"
+
